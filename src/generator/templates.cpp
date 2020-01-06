@@ -73,11 +73,11 @@ const char *Templates::EnumTypeRepeatedTemplate = "using $enum$Repeated = QList<
 
 const char *Templates::NamespaceTemplate = "\nnamespace $namespace$ {\n";
 const char *Templates::UsingNamespaceTemplate = "using namespace $namespace$;\n";
-const char *Templates::NonProtoClassDefinitionTemplate = "\nclass $classname$ : public QObject\n"
+const char *Templates::NonProtoClassDefinitionTemplate = "\nclass Q_PROTOBUF_GENERATED_EXPORT $classname$ : public QObject\n"
                                                          "{\n"
                                                          "    Q_OBJECT\n";
 const char *Templates::ProtoClassDeclarationTemplate = "class $classname$;\n";
-const char *Templates::ProtoClassDefinitionTemplate = "\nclass $classname$ : public QObject\n"
+const char *Templates::ProtoClassDefinitionTemplate = "\nclass Q_PROTOBUF_GENERATED_EXPORT $classname$ : public QObject\n"
                                                       "{\n"
                                                       "    Q_OBJECT\n"
                                                       "    Q_PROTOBUF_OBJECT\n"

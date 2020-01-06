@@ -180,25 +180,35 @@ Due to cmake restrictions it's required to specify resulting artifacts manually 
 
 **Parameters:**
 
-*TARGET* - name of you target that will be base for generated target name
+*TARGET* - name of you target that will be base for generated target name.
 
-*OUT_DIR* - output directory that will contain generated artifacts. Usually subfolder in build directory should be used
+*OUT_DIR* - output directory that will contain generated artifacts. Usually subfolder in build directory should be used.
 
-*GENERATED_HEADERS* - List of header files expected after generator job finished
+*GENERATED_HEADERS* - List of header files expected after generator job finished.
 
-*EXCLUDE_HEADERS* - List of header files to be excluded from pre-parsed list of expected header files (e.g. nested messages that are not supported by QtProtobuf generator)
+*EXCLUDE_HEADERS* - List of header files to be excluded from pre-parsed list of expected header files (e.g. nested messages that are not supported by QtProtobuf generator).
 
-*PROTO_FILES* - List of .proto files that will be used in generation procedure
+*PROTO_FILES* - List of .proto files that will be used in generation procedure.
 
-*MULTI* - Enables/disables multi-files generation mode. In case if this property is set to TRUE generator will create pair of header/source files for each message
+*MULTI* - Enables/disables multi-files generation mode. In case if this property is set to TRUE generator will create pair of header/source files for each message.
 
-**Note:** multi-files generation mode is defined as deprecated by QtProtobuf team, and might have poor support in future
+**Note:** multi-files generation mode is defined as deprecated by QtProtobuf team, and might have poor support in future.
 
 *QML* - Enables/disables QML code generation in protobuf classes. If set to TRUE qml related code for lists and qml registration to be generated.
 
 **Outcome:**
 
-*QtProtobuf_GENERATED* - variable that will contain generated STATIC library target name
+*QtProtobuf_GENERATED* - variable that will contain generated STATIC library target name.
+
+### qtprotobuf_link_archive
+
+qtprotobuf_link_archive - is cmake helper function that links whole archive to specified target. It might be used in case you know that all symbols from generated static library target must be present in you binary. E.g. if you deliver shared library with generated code to end-point consumer. It takes two arguments as input TARGET and GENERATED_TARGET, without variable names specification.
+
+**Paramters**
+
+*TARGET* - target generated code to be linked to.
+
+*GENERATED_TARGET* - generated code static library target.
 
 ### Usefull definitions
 
@@ -209,6 +219,27 @@ Due to cmake restrictions it's required to specify resulting artifacts manually 
 *QTPROTOBUF_MAKE_EXAMPLES* - if **TRUE/ON**, built-in examples will be built. **TRUE** by default
 
 *QTPROTOBUF_EXECUTABLE* - contains full path to QtProtobuf generator add_executable
+
+### Windows symbol exports
+
+In case if you need to use generated classes as part of shared library, it's required to [export symbols of generated classes](https://docs.microsoft.com/en-us/cpp/cpp/dllexport-dllimport?view=vs-2019).
+
+QtProtobuf has specific macro to define symbol export/imports. By default all symbols are not exported. To export generated symbols add QT_GENERATED_LIB compiler definition.
+
+E.g.:
+
+```cmake
+...
+add_library(MyTarget mylib.cpp)
+target_compile_definitions(MyTarget PRIVATE QT_GENERATED_LIB)
+qtprotobuf_link_archive(MyTarget ${QtProtobuf_GENERATED})
+...
+```
+
+## Limitations
+
+- QtProtobuf doesn't support nested messages, due to Qt Q_OBJECT limitations.
+- QtProtobuf doesn't fully support multi-file generation
 
 ## Running tests
 ```bash

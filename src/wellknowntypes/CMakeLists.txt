@@ -45,19 +45,7 @@ function(add_wellknowntype VARIABLE TYPENAME)
         endif()
     endforeach()
     target_include_directories(${QtProtobuf_GENERATED} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/generated)
-    if(WIN32)
-        get_target_property(EXISTING_FLAGS ${TARGET} LINK_FLAGS)
-        set_target_properties(${QtProtobuf_GENERATED} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-        set_target_properties(${TARGET} PROPERTIES LINK_DIRECTORIES "$<TARGET_FILE_DIR:${QtProtobuf_GENERATED}>")
-        if("${EXISTING_FLAGS}" STREQUAL "EXISTING_FLAGS-NOTFOUND")
-            set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "/WHOLEARCHIVE:${QtProtobuf_GENERATED}")
-        else()
-            set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "${EXISTING_FLAGS} /WHOLEARCHIVE:${QtProtobuf_GENERATED}")
-        endif()
-    else()
-        set(${VARIABLE} ${${VARIABLE}} -Wl,--whole-archive ${QtProtobuf_GENERATED} -Wl,--no-whole-archive PARENT_SCOPE)
-    endif()
-    add_dependencies(${TARGET} ${QtProtobuf_GENERATED})
+    qtprotobuf_link_archive(${TARGET} ${QtProtobuf_GENERATED})
 endfunction()
 
 add_library(${TARGET} SHARED ${SOURCES})
@@ -79,13 +67,12 @@ add_dependencies(api_qtprotobuf_gen type_qtprotobuf_gen source_context_qtprotobu
 
 protobuf_generate_qt_headers(PUBLIC_HEADERS ${PUBLIC_HEADERS} COMPONENT ${TARGET})
 
-target_compile_definitions(${TARGET} PRIVATE QT_BUILD_PROTOBUF_WELLKNOWNTYPES_LIB PUBLIC QTPROTOBUF_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+target_compile_definitions(${TARGET} PRIVATE QT_GENERATED_LIB PUBLIC QTPROTOBUF_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
     QTPROTOBUF_VERSION_MINOR=${PROJECT_VERSION_MINOR})
 
 add_library(${QTPROTOBUF_COMMON_NAMESPACE}::${TARGET} ALIAS ${TARGET})
 set_target_properties(${TARGET} PROPERTIES VERSION ${PROJECT_VERSION} PUBLIC_HEADER "${PUBLIC_HEADERS};${GENERATED_PUBLIC_HEADERS}" OUTPUT_NAME ${TARGET}
     PROTO_INCLUDES -I${QTPROTOBUF_SOURCE_DIR}/3rdparty/grpc/third_party/protobuf/src)
-set_target_properties(${TARGET} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 target_include_directories(${TARGET} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>

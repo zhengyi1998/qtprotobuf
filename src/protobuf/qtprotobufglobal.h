@@ -33,6 +33,12 @@
 #  define Q_PROTOBUF_EXPORT Q_DECL_IMPORT
 #endif
 
+#if defined(QT_GENERATED_LIB)
+#  define Q_PROTOBUF_GENERATED_EXPORT Q_DECL_EXPORT
+#else
+#  define Q_PROTOBUF_GENERATED_EXPORT Q_DECL_IMPORT
+#endif
+
 //Support macro for Qt versions < 5.13
 //TODO: remove once migration to 5.14 as minimum required version is completed
 #ifndef Q_DISABLE_MOVE
